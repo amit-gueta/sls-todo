@@ -1,0 +1,112 @@
+service: serverless-http-api-dynamodb
+frameworkVersion: '2'
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: false
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  lambdaHashingVersion: 20201221
+  #profile: devProfile
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${sls:stage}
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  signup:
+    handler: todos/signup.signup
+    events:
+      - httpApi:
+          path: /signup
+          method: post
+
+  confirm:
+    handler: todos/confirm.main
+    events:
+      - httpApi:
+          path: /confirm
+          method: post
+  
+  auth:
+    handler: todos/auth.main
+    events:
+      - httpApi:
+          path: /auth
+          method: post
+
+  listAll:
+    handler: todos/list.main
+    events:
+      - httpApi:
+          path: /todos
+          method: get
+
+  create:
+    handler: todos/createTodo.main
+    events:
+      - httpApi:
+          path: /create
+          method: post
+
+  get:
+    handler: todos/showTodo.main
+    events:
+      - httpApi:
+          path: /todos/{id}
+          method: get
+
+  update:
+    handler: todos/updateTodo.main
+    events:
+      - httpApi:
+          path: /todos/{id}
+          method: put
+
+  delete:
+    handler: todos/deleteTodo.main
+    events:
+      - httpApi:
+          path: /todos/{id}
+          method: delete
+
+resources:
+  Resources:
+    TodosDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: userId
+            AttributeType: S
+          -
+            AttributeName: todoId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: userId
+            KeyType: HASH
+          -
+            AttributeName: todoId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
