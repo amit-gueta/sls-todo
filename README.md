@@ -1,8 +1,10 @@
 # sls-todo
 
 
-Serverless TODO app, deploy by (serverless)[https://www.serverless.com/]
+Serverless TODO app, deploy by [serverless](https://www.serverless.com/)  
 In order to run it, just run `serverless deploy`
+
+
 
 
 How to use?
