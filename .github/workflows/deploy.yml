@@ -1,4 +1,5 @@
 name: Deploy Production
+
 # on main branch updates
 on:
     push:
@@ -16,17 +17,11 @@ jobs:
             - name: Install Serverless Framework
               run: npm install -g serverless
               # authentication
-            # - name: Serverless AWS authentication
-            #   run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY_DEPLOY }} --secret ${{ secrets.AWS_SECRET_DEPLOY }}
-              # create ENV, use the shell `cat` command to create env.yml from secrets
-            # - name: Create env file
-            #   run: |
-            #       cat > env.yml << EOF
-            #       ${{ secrets.ENV }}
-            #       EOF
+            - name: Serverless AWS authentication
+              run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY_DEPLOY }} --secret ${{ secrets.AWS_SECRET_DEPLOY }}
               #install node modules
             - name: Install NPM dependencies
               run: npm install
               #serverless deploy
-            # - name: Deploy
-            #   run: sls deploy -s prod
+            - name: Deploy
+              run: sls deploy -s dev
