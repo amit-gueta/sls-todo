@@ -19,4 +19,5 @@ jobs:
       run: |
         pwd
         ls
-        pylint `ls -R|grep .py$|xargs`
+        cd todos
+        pylint `ls | grep .py$ | xargs`
